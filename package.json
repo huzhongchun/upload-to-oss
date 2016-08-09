@@ -1,6 +1,6 @@
 {
   "name": "upload-to-oss",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "'watch local changed files,then,upload to ali oss.'",
   "main": "app.js",
   "dependencies": {
@@ -12,6 +12,10 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huzhongchun/upload-to-oss"
   },
   "author": {
     "name": "huzhongchun"
