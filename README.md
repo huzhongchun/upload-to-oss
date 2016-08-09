@@ -27,7 +27,7 @@
     "accessKeySecret": "",
     "bucket": ""
   },
-  "ignores": [".record","upOssConfig.json","node_modules"],
+  "ignores": [".record","upOssConfig.json","node_modules",".idea/",".git/"],
   "autoSave": 20
 }
 ```
