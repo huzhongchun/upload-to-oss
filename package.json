@@ -1,6 +1,6 @@
 {
   "name": "upload-to-oss",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "'watch local changed files,then,upload to ali oss.'",
   "main": "app.js",
   "dependencies": {
