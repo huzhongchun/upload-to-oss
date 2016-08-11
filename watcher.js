@@ -36,9 +36,9 @@ _watchPath = process.argv[1] ? process.argv[1] : './';
 function startWatchProgram() {
     watch(_rootPath, function (filename) {
         //_consoleLog('变化的文件',filename);
-        updateIntervalLoop();
         if (!repeatCheck(filename,_changedRecordsArray) && !ignoreCheck(filename,_ignoreFilesPathArray)) {
             _changedRecordsArray.push(filename);
+            updateIntervalLoop();
         }
         if (_changedRecordsArray.length >= 100) {
             updateRecordFile(_changedRecordsArray);
