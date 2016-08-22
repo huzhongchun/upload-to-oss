@@ -14,7 +14,6 @@ log4js.configure({
     appenders:[{
         type: 'console',
         layout: {
-            type: 'pattern',
             pattern: '[%r] [%p][%c] - %m%n'
         }
     }]
