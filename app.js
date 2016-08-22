@@ -8,6 +8,17 @@ var OSS = require('ali-oss');
 var fs = require('fs');
 var path = require('path');
 var getConfig = require('./config.js');
+var log4js = require('log4js');
+
+log4js.configure({
+    appenders:{
+        type: 'console',
+    },
+    layout: {
+        type: 'pattern',
+        pattern: '[%r] [%p][%c] - %m%n'
+    }
+});
 
 var _rootPath = '', _bucketName = '', _recordFile = '', _configJsonFile = '', _relativePath = '';
 var client = null;
@@ -79,15 +90,15 @@ function uploadSingleFile(bucketName,localPath,ossPath,callback) {
         client.useBucket(bucketName);
         var result = yield client.put(ossPath,localPath);
         if(result.res.status == 200){
-            console.log('---- '+ossPath+' ---- 上传成功');
+            log.trace('---- '+ossPath+' ---- 上传成功');
         }else{
-            console.log('==== '+ossPath+' ====上传失败!');
-            console.log(result);
+            log.error('==== '+ossPath+' ====上传失败!');
+            log.error(result);
         }
         if(_callback)
             _callback();
     }).catch(function (err) {
-        console.log(err);
+        log.error(err);
         if(_callback)
             _callback();
     });
@@ -103,17 +114,17 @@ function deleteSingleFile(objectKey,callback) {
     co(function* () {
         var result = yield client.delete(objectKey);
         if(result.res.status < 299 && result.res.status >= 200){
-            console.log('---- '+objectKey+' ---- 删除成功');
+            log.trace('---- '+objectKey+' ---- 删除成功');
         }else{
             console.log('\n');
-            console.log('==== '+objectKey+' ==== 删除失败!');
-            console.log(result);
+            log.error('==== '+objectKey+' ==== 删除失败!');
+            log.error(result);
             console.log('\n');
         }
         if(callback)
             callback(result);
     }).catch(function (err) {
-        console.log(err);
+        log.error(err);
     });
 }
 /**
@@ -148,7 +159,7 @@ function checkFileExists(filePath,callback) {
  */
 function cleanRecordFile(file) {
     fs.writeFile(file,'/** 此文件为文件变化监测记录,请勿删除 **/','utf8',function(err){
-        if(err) console.log(err);
+        if(err) log.error(err);
         _consoleLog('提示','记录文件数据清除成功~');
     });
 }
@@ -208,7 +219,7 @@ function uploadFilesQueue(n) {
         n++;
         if(n % 20 == 0){
             console.log('\n');
-            console.log('---- 文件上传成功 '+n+' 个  ----');
+            log.trace('---- 文件上传成功 '+n+' 个  ----');
             console.log('\n');
             setTimeout(function () {
                 if(!item.match(/^\/\*\*.*(\*\*\/)?$/g)){

@@ -1,15 +1,18 @@
 {
   "name": "upload-to-oss",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "'watch local changed files,then,upload to ali oss.'",
   "main": "app.js",
   "dependencies": {
     "ali-oss": "^4.4.4",
     "co": "^4.6.0",
     "node-watch": "^0.4.0",
-    "glob-plus": "^0.0.2"
+    "glob-plus": "^0.0.2",
+    "log4js": "^0.6.38"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "log4js": "^0.6.38"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
