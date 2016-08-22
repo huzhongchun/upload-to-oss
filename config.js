@@ -66,9 +66,9 @@ function readConfigFile(path,deepString,callback) {
  */
 
 log4js.configure({
-    appenders:{
+    appenders:[{
         type: 'console',
-    },
+    }],
     layout: {
         type: 'pattern',
         pattern: '[%r] [%p][%c] - %m%n'
@@ -80,7 +80,7 @@ function consoleLog(title,content) {
     var content = content ? content : '暂无';
     console.log('=================================>');
     console.log('---- '+title+' ----')
-    log.trace(content);
+    console.log(content);
     console.log('<=================================');
     console.log('\n');
 }

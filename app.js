@@ -11,9 +11,9 @@ var getConfig = require('./config.js');
 var log4js = require('log4js');
 
 log4js.configure({
-    appenders:{
+    appenders:[{
         type: 'console',
-    },
+    }],
     layout: {
         type: 'pattern',
         pattern: '[%r] [%p][%c] - %m%n'
