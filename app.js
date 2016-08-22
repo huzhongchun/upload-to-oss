@@ -13,12 +13,14 @@ var log4js = require('log4js');
 log4js.configure({
     appenders:[{
         type: 'console',
-    }],
-    layout: {
-        type: 'pattern',
-        pattern: '[%r] [%p][%c] - %m%n'
-    }
+        layout: {
+            type: 'pattern',
+            pattern: '[%r] [%p][%c] - %m%n'
+        }
+    }]
 });
+var log = log4js.getLogger();
+
 
 var _rootPath = '', _bucketName = '', _recordFile = '', _configJsonFile = '', _relativePath = '';
 var client = null;

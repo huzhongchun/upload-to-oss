@@ -5,7 +5,6 @@
 var glob = require('glob-plus');
 var fs = require('fs');
 var _path = require('path');
-var log4js = require('log4js');
 
 
 var _processRunPath = process.cwd() + '/';  //此程序执行的路径
@@ -64,17 +63,6 @@ function readConfigFile(path,deepString,callback) {
  * @param title
  * @param conent
  */
-
-log4js.configure({
-    appenders:[{
-        type: 'console',
-    }],
-    layout: {
-        type: 'pattern',
-        pattern: '[%r] [%p][%c] - %m%n'
-    }
-});
-var log = log4js.getLogger();
 
 function consoleLog(title,content) {
     var content = content ? content : '暂无';
