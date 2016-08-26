@@ -194,7 +194,7 @@ function findRecordAssetsFile(n,callback) {
     });
     plus.on('end', () => {
         let index = n+1;
-        if(index < _readRecordFileArray.length)
+        if(index < _readRecordFileArray.length - 1)
             findRecordAssetsFile(index,callback);
         else{
             _allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
@@ -231,10 +231,13 @@ function uploadFilesQueue(n) {
                             uploadSingleFile(_bucketName,file,ossPath,function(){
                                 uploadFilesQueue(n)
                             });
-                        else
-                            deleteSingleFile(ossPath,function () {
+                        else if(ossPath) {
+                            deleteSingleFile(ossPath, function () {
                                 uploadFilesQueue(n);
                             });
+                        }else{
+                            uploadFilesQueue(n);
+                        }
                     });
                 }else{
                     uploadFilesQueue(n);
@@ -249,10 +252,13 @@ function uploadFilesQueue(n) {
                         uploadSingleFile(_bucketName,file,ossPath,function(){
                             uploadFilesQueue(n)
                         });
-                    else
-                        deleteSingleFile(ossPath,function () {
+                    else if(ossPath) {
+                        deleteSingleFile(ossPath, function () {
                             uploadFilesQueue(n);
                         });
+                    }else{
+                            uploadFilesQueue(n);
+                        }
                 });
             }else{
                 uploadFilesQueue(n);
