@@ -194,7 +194,7 @@ function findRecordAssetsFile(n,callback) {
     });
     plus.on('end', () => {
         let index = n+1;
-        if(index < _readRecordFileArray.length - 1)
+        if(index < _readRecordFileArray.length)
             findRecordAssetsFile(index,callback);
         else{
             _allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
