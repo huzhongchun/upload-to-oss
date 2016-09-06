@@ -197,7 +197,9 @@ function findRecordAssetsFile(n,callback) {
         if(index < _readRecordFileArray.length)
             findRecordAssetsFile(index,callback);
         else{
-            _allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
+            //_allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
+            //避免被人扒非压缩的静态资源,只上传压缩的文件
+            _allRecordFileArray = _assetsRecordFileArray;
             _consoleLog('要操作的所有的相关的文件',_allRecordFileArray);
             if(callback)
                 callback();
