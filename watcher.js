@@ -63,6 +63,11 @@ function startWatchProgram() {
         _consoleLog('Watcher closed!', _rootPath, ',because: ', reason);
         stalker.removeAllListeners();
     });
+
+    var stalkerIgnoreFilesArray = [];
+    for(let i=0;i<_ignoreFilesNameArray.length;i++){
+        stalkerIgnoreFilesArray.push(_rootPath+_ignoreFilesNameArray[i]);
+    }
     stalker.setConfig({
         stat: null,
         interval: 5007,
@@ -70,7 +75,7 @@ function startWatchProgram() {
         catchupDelay: 2000,
         preferredMethods: ['watch', 'watchFile'],
         followLinks: true,
-        ignorePaths: [_rootPath+'.idea/',_rootPath+'_assets/',_rootPath+'.idea'],
+        ignorePaths: stalkerIgnoreFilesArray,
         ignoreHiddenFiles: true,
         ignoreCommonPatterns: true,
         ignoreCustomPatterns: null

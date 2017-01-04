@@ -8,19 +8,14 @@ var _path = require('path');
 
 
 var _processRunPath = process.cwd() + '/';  //此程序执行的路径
-var _configJsonFile = 'upOssConfig.json',_config = null;
+var _configJsonFile = '.upOssConfig',_config = null;
 /**
  * 查找配置文件
  * @param callback
- * @deep 向上查找文件夹的层级数
  */
-var maxDeep = 3, startDeep = 0;
 function findConfigJsonFile(callback) {
     let deepString = '', configPath = '';
-    for(let i = 0;i < startDeep;i++){
-        deepString += '../';
-    }
-    let plus = glob.plus(deepString+_configJsonFile, { ignore: 'node_modules/**' })
+    let plus = glob.plus(_configJsonFile, { ignore: 'node_modules/**' })
     plus.on('file', ({ name, stats, data }) => {
         configPath = name;
     });
@@ -28,11 +23,8 @@ function findConfigJsonFile(callback) {
         if(configPath){
             readConfigFile(configPath,deepString,callback);
         }else{
-            startDeep++;
-            if(startDeep <= maxDeep)
-                findConfigJsonFile(callback);
-            else
-                consoleLog('警告','没有找到配置文件,请创建~');
+            fs.writeFileSync(_processRunPath+_configJsonFile, '{"configFileName": "'+_configJsonFile+'","basePath":"'+_processRunPath+'","watchPath":"","recordFileName":".record","oss":{"region":"","accessKeyId":"","accessKeySecret":"","bucket":""},"ignores":[".record",".gitignore",".upOssConfig","node_modules/","_assets/","conf/","workspace.xml",".idea/",".git/"],"autoSave":10}','utf8');
+            consoleLog('配置文件已生成','请在配置参数后执行程序 \n 文件所在路径:'+_processRunPath);
         }
     });
 }
