@@ -1,13 +1,13 @@
 # upload-to-oss
-**简单的文件检测+阿里云上传**
+** 前端静态资源检测,并上传到阿里云的oss **
 
 ============================
 
 ### 说明 ###
 -------
-- watcher.js负责记录修改的文件,写入记录文件中, 需要一开始就开启
-- app.js 负责读取记录文件里的记录,然后上传到oss
-- app.js会查找监测文件夹下所有与记录同名的文件,目的是解决,前端静态资源压缩后,把压缩后的资源一同上传到oss
+- watcher.js 负责记录修改的文件,写入记录文件中, 需要一开始就开启
+- upload.js 负责读取记录文件里的记录,然后上传到oss
+- upload.js 会查找监测文件夹下所有与记录同名的文件,目的是解决,前端静态资源压缩后,把压缩后的资源一同上传到oss
 - config.js 负责读取配置文件
 - 记录里面路径都采用绝对路径,暂不支持window
 
@@ -49,7 +49,7 @@ node xxxx/upload-to-oss/watcher
 ###上传到oss
 -------
 ```javascript
-node xxxx/upload-to-oss/app
+node xxxx/upload-to-oss/upload
 ```
 
 ### 注意

@@ -1,11 +1,12 @@
 /**
-* Created by huzhongchun on 16/8/4.
-* 文件改动监测程序
-*/
+ * Created by huzhongchun on 16/8/4.
+ * 文件改动监测程序
+ */
 
 var fs = require('fs');
 var glob = require("glob-plus");
 var watch = require('node-watch');
+var watcher = require('watchr');
 var getConfig = require('./config.js');
 var log4js = require('log4js');
 
@@ -45,8 +46,10 @@ _watchPath = process.argv[1] ? process.argv[1] : './';
  * _intervalLoop 辅助监测写入文件,如果更改记录没有达到100次, 辅助监测程序会在20秒之后把记录存入记录文件
  */
 function startWatchProgram() {
-    watch(_rootPath, function (filename) {
-        //_consoleLog('变化的文件',filename);
+    var stalker = watcher.create(_rootPath);
+    stalker.on('change',function(changeType, fullPath, currentStat, previousStat){
+        var filename = fullPath;
+        _consoleLog('变化的文件',filename);
         if (!repeatCheck(filename,_changedRecordsArray) && !ignoreCheck(filename,_ignoreFilesPathArray)) {
             _changedRecordsArray.push(filename);
             updateIntervalLoop();
@@ -55,6 +58,31 @@ function startWatchProgram() {
             updateRecordFile(_changedRecordsArray);
         }
     });
+    stalker.on('log', console.log);
+    stalker.once('close', function (reason) {
+        _consoleLog('Watcher closed!', _rootPath, ',because: ', reason);
+        stalker.removeAllListeners();
+    });
+    stalker.setConfig({
+        stat: null,
+        interval: 5007,
+        persistent: true,
+        catchupDelay: 2000,
+        preferredMethods: ['watch', 'watchFile'],
+        followLinks: true,
+        ignorePaths: [_rootPath+'.idea/',_rootPath+'_assets/',_rootPath+'.idea'],
+        ignoreHiddenFiles: true,
+        ignoreCommonPatterns: true,
+        ignoreCustomPatterns: null
+    });
+
+    function next (err) {
+        if ( err )  return console.log('watch failed on', _rootPath, 'with error', err)
+        console.log('watch successful on', _rootPath)
+    }
+
+    stalker.watch(next);
+    //stalker.close();
 }
 
 
