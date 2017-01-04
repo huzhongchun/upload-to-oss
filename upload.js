@@ -26,7 +26,7 @@ var client = null;
 
 //格式化log打印
 var _consoleLog = getConfig.consoleLog;
-
+var _uploadBlock =  false;
 
 
 
@@ -99,7 +99,9 @@ function uploadSingleFile(bucketName,localPath,ossPath,callback) {
         if(_callback)
             _callback();
     }).catch(function (err) {
+        log.error('==== '+ossPath+' ====上传失败!');
         log.error(err);
+        //这里也执行callback,以保证单个文件的上传失败,不会阻断上传队列的后续执行;
         if(_callback)
             _callback();
     });
