@@ -13,11 +13,11 @@
 
 ### 如何使用
 -------
-#### 在项目根目录下创建配置文件:  upOssConfig.json
+#### 第一次执行watcher的时候,会在项目根目录下创建配置文件:  .upOssConfig
 
 ```javascript
 {
-  "configFileName": "upOssConfig.json",
+  "configFileName": ".upOssConfig",
   "basePath": "",
   "watchPath": "",
   "recordFileName": ".record",
@@ -27,7 +27,7 @@
     "accessKeySecret": "",
     "bucket": ""
   },
-  "ignores": [".record","upOssConfig.json","node_modules",".idea/",".git/"],
+  "ignores": [".record",".upOssConfig","node_modules/",".idea/",".git/"],
   "autoSave": 20
 }
 ```
