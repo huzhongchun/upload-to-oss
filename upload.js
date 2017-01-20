@@ -22,6 +22,14 @@ var log = log4js.getLogger();
 
 
 var _rootPath = '', _bucketName = '', _recordFile = '', _configJsonFile = '', _relativePath = '';
+
+/**
+ * 文件上传的方式:
+ * normalToAssets -- 本地非压缩文件上传到oss的压缩文件_assets下
+ * assetsToAssets -- 本地压缩文件_assets下的文件上传到oss的压缩文件_assets下
+ */
+var _uploadType = 'assetsToAssets';
+
 var client = null;
 
 //格式化log打印
@@ -231,6 +239,12 @@ function uploadFilesQueue(n) {
                     checkFileExists(item,function(exists,file) {
                         let reg = new RegExp(_rootPath);
                         let ossPath = file.replace(reg,'');
+                        /** 文件上传的方式 默认压缩文件到压缩文件 **/
+                        if(_uploadType == 'assetToAsset')
+                            ossPath = file.replace(reg,'');
+                        else if(_uploadType == 'normalToAsset')
+                            ossPath = file.replace(reg,'_assets/');
+
                         if(exists)
                             uploadSingleFile(_bucketName,file,ossPath,function(){
                                 uploadFilesQueue(n)
@@ -251,7 +265,14 @@ function uploadFilesQueue(n) {
             if(!item.match(/^\/\*\*.*(\*\*\/)?$/g)){
                 checkFileExists(item,function(exists,file) {
                     let reg = new RegExp(_rootPath);
+
                     let ossPath = file.replace(reg,'');
+                    /** 文件上传的方式 默认压缩文件到压缩文件 **/
+                    if(_uploadType == 'assetToAsset')
+                        ossPath = file.replace(reg,'');
+                    else if(_uploadType == 'normalToAsset')
+                        ossPath = file.replace(reg,'_assets/');
+
                     if(exists)
                         uploadSingleFile(_bucketName,file,ossPath,function(){
                             uploadFilesQueue(n)
@@ -298,6 +319,8 @@ getConfig.findConfigJsonFile(function (config) {
     _rootPath = config.rootPath;
     _configJsonFile = _rootPath + config.configFileName;
     _recordFilePath = _rootPath + config.recordFileName;
+
+    _uploadType = config.uploadType ?  config.uploadType : _uploadType;
 
     client = new OSS({
         region: config.oss.region,
