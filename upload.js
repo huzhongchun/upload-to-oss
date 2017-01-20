@@ -238,12 +238,14 @@ function uploadFilesQueue(n) {
                 if(!item.match(/^\/\*\*.*(\*\*\/)?$/g)){
                     checkFileExists(item,function(exists,file) {
                         let reg = new RegExp(_rootPath);
-                        let ossPath = file.replace(reg,'');
+                        let ossPath = '';
                         /** 文件上传的方式 默认压缩文件到压缩文件 **/
                         if(_uploadType == 'assetToAsset')
                             ossPath = file.replace(reg,'');
                         else if(_uploadType == 'normalToAsset')
                             ossPath = file.replace(reg,'_assets/');
+                        else
+                            ossPath = file.replace(reg,'');
 
                         if(exists)
                             uploadSingleFile(_bucketName,file,ossPath,function(){
@@ -265,13 +267,14 @@ function uploadFilesQueue(n) {
             if(!item.match(/^\/\*\*.*(\*\*\/)?$/g)){
                 checkFileExists(item,function(exists,file) {
                     let reg = new RegExp(_rootPath);
-
-                    let ossPath = file.replace(reg,'');
+                    let ossPath = '';
                     /** 文件上传的方式 默认压缩文件到压缩文件 **/
                     if(_uploadType == 'assetToAsset')
                         ossPath = file.replace(reg,'');
                     else if(_uploadType == 'normalToAsset')
                         ossPath = file.replace(reg,'_assets/');
+                    else
+                        ossPath = file.replace(reg,'');
 
                     if(exists)
                         uploadSingleFile(_bucketName,file,ossPath,function(){
