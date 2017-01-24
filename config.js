@@ -23,7 +23,7 @@ function findConfigJsonFile(callback) {
         if(configPath){
             readConfigFile(configPath,deepString,callback);
         }else{
-            fs.writeFileSync(_processRunPath+_configJsonFile, '{"configFileName": "'+_configJsonFile+'","basePath":"'+_processRunPath+'","uploadType": "assetToAsset","watchPath":"","recordFileName":".record","oss":{"region":"","accessKeyId":"","accessKeySecret":"","bucket":""},"ignores":[".record",".gitignore",".upOssConfig","node_modules/","_assets/","conf/","workspace.xml",".idea/",".git/"],"autoSave":10}','utf8');
+            fs.writeFileSync(_processRunPath+_configJsonFile, '{"configFileName": "'+_configJsonFile+'","basePath":"'+_processRunPath+'","uploadType": "","watchPath":"","recordFileName":".record","oss":{"region":"","accessKeyId":"","accessKeySecret":"","bucket":""},"ignores":[".record",".gitignore",".upOssConfig","node_modules/","_assets/","conf/","workspace.xml",".idea/",".git/"],"autoSave":10}','utf8');
             consoleLog('配置文件已生成','请在配置参数后执行程序 \n 文件所在路径:'+_processRunPath);
         }
     });

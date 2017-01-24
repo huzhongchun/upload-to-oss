@@ -21,6 +21,7 @@
   "basePath": "",
   "watchPath": "",
   "recordFileName": ".record",
+  "uploadType": "",
   "oss": {
     "region": "",
     "accessKeyId": "",
@@ -28,14 +29,14 @@
     "bucket": ""
   },
   "ignores": [".record",".upOssConfig","node_modules/",".idea/",".git/"],
-  "autoSave": 20
+  "autoSave": 10
 }
 ```
 
 - configFileName: 配置文件名 默认:upOssConfig.json
 - basePath: 根目录的绝对路
 - watchPath: 监测文件的绝对路径,默认: 为配置文件所在的文件夹
-- uploadType: 文件上传方式, 默认: assetToAsset; 1.assetToAsset 本地_assets文件上传到oss的_assets下面 2.normalToAsset 本地检测文件上传到oss的_assets下面
+- uploadType: 文件上传方式, 默认: 全部对应上传; 1.assetsToAssets 本地_assets文件上传到oss的_assets下面 2.normalToAssets 本地检测文件上传到oss的_assets下面 3. 全部对应上传
 - recordFileName: 监测结果记录文件名,默认:.record
 - oss: 阿里对象存储
 - ignores: 忽略文件或文件名

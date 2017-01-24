@@ -25,10 +25,11 @@ var _rootPath = '', _bucketName = '', _recordFile = '', _configJsonFile = '', _r
 
 /**
  * 文件上传的方式:
+ * 默认 -- 全部对应上传
  * normalToAssets -- 本地非压缩文件上传到oss的压缩文件_assets下
  * assetsToAssets -- 本地压缩文件_assets下的文件上传到oss的压缩文件_assets下
  */
-var _uploadType = 'assetsToAssets';
+var _uploadType = '';
 
 var client = null;
 
@@ -207,9 +208,15 @@ function findRecordAssetsFile(n,callback) {
         if(index < _readRecordFileArray.length)
             findRecordAssetsFile(index,callback);
         else{
-            //_allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
-            //避免被人扒非压缩的静态资源,只上传压缩的文件
-            _allRecordFileArray = _assetsRecordFileArray;
+
+            if(_uploadType == 'assetsToAssets'){
+                _allRecordFileArray = _assetsRecordFileArray;
+            }else if(_uploadType == 'normalToAssets'){
+                _allRecordFileArray = _readRecordFileArray;
+            }else{
+                _allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
+            }
+
             _consoleLog('要操作的所有的相关的文件',_allRecordFileArray);
             if(callback)
                 callback();
@@ -240,9 +247,9 @@ function uploadFilesQueue(n) {
                         let reg = new RegExp(_rootPath);
                         let ossPath = '';
                         /** 文件上传的方式 默认压缩文件到压缩文件 **/
-                        if(_uploadType == 'assetToAsset')
+                        if(_uploadType == 'assetsToAssets')
                             ossPath = file.replace(reg,'');
-                        else if(_uploadType == 'normalToAsset')
+                        else if(_uploadType == 'normalToAssets')
                             ossPath = file.replace(reg,'_assets/');
                         else
                             ossPath = file.replace(reg,'');
@@ -269,9 +276,9 @@ function uploadFilesQueue(n) {
                     let reg = new RegExp(_rootPath);
                     let ossPath = '';
                     /** 文件上传的方式 默认压缩文件到压缩文件 **/
-                    if(_uploadType == 'assetToAsset')
+                    if(_uploadType == 'assetsToAssets')
                         ossPath = file.replace(reg,'');
-                    else if(_uploadType == 'normalToAsset')
+                    else if(_uploadType == 'normalToAssets')
                         ossPath = file.replace(reg,'_assets/');
                     else
                         ossPath = file.replace(reg,'');
@@ -285,8 +292,8 @@ function uploadFilesQueue(n) {
                             uploadFilesQueue(n);
                         });
                     }else{
-                            uploadFilesQueue(n);
-                        }
+                        uploadFilesQueue(n);
+                    }
                 });
             }else{
                 uploadFilesQueue(n);
@@ -306,14 +313,14 @@ function uploadFilesQueue(n) {
  */
 
 /**
-* 读取记录文件,上传修改文件
-*
-* readRecordFile 的问题是所有改变了"修改时间"的文件都会被记录,而不是真正的内容变化
-* 而fis3 release之后的所有的文件的"修改时间"都更新了
-*
-* @hanck: 只把记录里的文件作为基础,再把压缩后的同名文件匹配出来,然后再上传到OSS
-*
-*/
+ * 读取记录文件,上传修改文件
+ *
+ * readRecordFile 的问题是所有改变了"修改时间"的文件都会被记录,而不是真正的内容变化
+ * 而fis3 release之后的所有的文件的"修改时间"都更新了
+ *
+ * @hanck: 只把记录里的文件作为基础,再把压缩后的同名文件匹配出来,然后再上传到OSS
+ *
+ */
 var _readRecordFileArray = [],_assetsRecordFileArray = [], _allRecordFileArray = [];
 
 
