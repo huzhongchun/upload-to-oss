@@ -331,7 +331,11 @@ getConfig.findConfigJsonFile(function (config) {
     _recordFilePath = _rootPath + config.recordFileName;
 
     _uploadType = config.uploadType ?  config.uploadType : _uploadType;
-
+    if(_uploadType === 'normalToAssets'){
+        console.log('\n------上传模式：非压缩文件------ \n');
+    }else{
+        console.log('\n------上传模式：_asset压缩文件------\n');
+    }
     client = new OSS({
         region: config.oss.region,
         accessKeyId: config.oss.accessKeyId,
