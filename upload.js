@@ -10,6 +10,9 @@ var path = require('path');
 var getConfig = require('./config.js');
 var log4js = require('log4js');
 
+//命令行传参 .../upload.js --t 'normal'  仅normal有效否则走配置文件的设置
+var processType = process.argv[3];
+
 log4js.configure({
     appenders:[{
         type: 'console',
@@ -29,7 +32,9 @@ var _rootPath = '', _bucketName = '', _recordFile = '', _configJsonFile = '', _r
  * normalToAssets -- 本地非压缩文件上传到oss的压缩文件_assets下
  * assetsToAssets -- 本地压缩文件_assets下的文件上传到oss的压缩文件_assets下
  */
-var _uploadType = '';
+
+var _uploadType = processType && processType === 'normal' ? 'normalToAssets' : '';
+
 
 var client = null;
 
@@ -330,7 +335,8 @@ getConfig.findConfigJsonFile(function (config) {
     _configJsonFile = _rootPath + config.configFileName;
     _recordFilePath = _rootPath + config.recordFileName;
 
-    _uploadType = config.uploadType ?  config.uploadType : _uploadType;
+    _uploadType =  _uploadType ? _uploadType : (config.uploadType ?  config.uploadType : '');
+
     if(_uploadType === 'normalToAssets'){
         console.log('\n------上传模式：非压缩文件------ \n');
     }else{
