@@ -45,13 +45,13 @@
 ### 启动监测
 -------
 ```javascript
-node xxxx/upload-to-oss/watcher
+node xxxx/upload-to-oss/watcher [-p 'xx/xx']
 ```
 
 ###上传到oss
 -------
 ```javascript
-node xxxx/upload-to-oss/upload
+node xxxx/upload-to-oss/upload [-t 'normal']
 ```
 
 ### 注意

@@ -1,6 +1,6 @@
 {
   "name": "upload-to-oss",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "'watch local changed files,then,upload to ali oss.'",
   "main": "app.js",
   "dependencies": {
@@ -9,7 +9,7 @@
     "glob-plus": "^0.0.2",
     "log4js": "^0.6.38",
     "node-watch": "^0.4.0",
-    "watchr": "^3.0.1"
+    "watchr": "^4.0.1"
   },
   "devDependencies": {
     "log4js": "^0.6.38",

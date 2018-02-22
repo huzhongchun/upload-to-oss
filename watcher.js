@@ -36,7 +36,7 @@ var _autoSave = 20;
  * 获取运行参数
  * 如果没有传入,则默认当前文件夹下
  */
-_watchPath = process.argv[1] ? process.argv[1] : './';
+_watchPath = process.argv[3] ? process.argv[3] : './';
 
 
 /**
@@ -46,7 +46,7 @@ _watchPath = process.argv[1] ? process.argv[1] : './';
  * _intervalLoop 辅助监测写入文件,如果更改记录没有达到100次, 辅助监测程序会在20秒之后把记录存入记录文件
  */
 function startWatchProgram() {
-    var stalker = watcher.create(_rootPath);
+    var stalker = watcher.create(_rootPath+_watchPath);
     stalker.on('change',function(changeType, fullPath, currentStat, previousStat){
         var filename = fullPath;
         _consoleLog('变化的文件',filename);

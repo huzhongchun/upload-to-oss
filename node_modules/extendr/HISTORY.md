@@ -1,5 +1,9 @@
 # History
 
+## v3.3.0 2018 January 26
+- Added `dereference` as an alternative for `dereferenceJSON`
+- Updated base files
+
 ## v3.2.2 2016 June 19
 - Re-added node 0.10 compatibility (regression since v3.0.0)
   - Albeit implicit/untested compat as dev deps require node >=0.12
