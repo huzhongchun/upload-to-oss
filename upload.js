@@ -307,8 +307,9 @@ function uploadFilesQueue(n) {
 
     }else{
         _consoleLog('提示','文件处理成功 '+n+' 个');
-        cleanRecordFile(_recordFile);
-        _filesArray = [];
+        if(n > 0){
+            cleanRecordFile(_recordFile);
+        }
     }
 }
 
