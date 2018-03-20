@@ -152,10 +152,10 @@ function deleteSingleFile(objectKey,callback) {
  * @param mode
  */
 function readRecordFile(recordFilePath,mode) {
-    var _mode = mode ? mode :'utf8';
-    var data = fs.readFileSync(recordFilePath,_mode);
-    var recordsArray = data.split('\n');
-    return recordsArray;
+    let _mode = mode ? mode :'utf8';
+    let data = fs.readFileSync(recordFilePath,_mode);
+    let replaceData = data.replace(/\n+/g,'\n');
+    return replaceData.split('\n');
 }
 
 
@@ -189,34 +189,15 @@ function cleanRecordFile(file) {
  * @param callback
  */
 function findRecordAssetsFile(n,callback) {
-    var matchString = '', string = transAbsolutePathToRelativePath(_readRecordFileArray[n],_rootPath);
-    //如果是有后缀的,则直接匹配文件名
-    if(string.match(/\.\w+$/g)){
-        matchString = '_assets/'+string+'**';
-    }else{
-        //没有后缀的则直接匹配文件夹下的所有文件
-        _readRecordFileArray.splice(n,1);
-        n--;
-        if(string != '')
-            matchString = '**/'+string+'/**';
-        else
-            matchString = '';
-    }
-    let plus = glob.plus(_relativePath + matchString, { ignore: 'node_modules/**' })
-    plus.on('file', ({ name, stats, data }) => {
-        let reg = new RegExp(_relativePath);
-        let absoluteNamePath = name.replace(reg,_rootPath);
-        _assetsRecordFileArray.push(absoluteNamePath);
-    });
-    plus.on('end', () => {
+    let matchString = '', string = transAbsolutePathToRelativePath(_readRecordFileArray[n],_rootPath);
+    if(!string){
         let index = n+1;
         if(index < _readRecordFileArray.length)
             findRecordAssetsFile(index,callback);
         else{
-
-            if(_uploadType == 'assetsToAssets'){
+            if(_uploadType === 'assetsToAssets'){
                 _allRecordFileArray = _assetsRecordFileArray;
-            }else if(_uploadType == 'normalToAssets'){
+            }else if(_uploadType === 'normalToAssets'){
                 _allRecordFileArray = _readRecordFileArray;
             }else{
                 _allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
@@ -226,7 +207,45 @@ function findRecordAssetsFile(n,callback) {
             if(callback)
                 callback();
         }
-    })
+    }else {
+        //如果是有后缀的,则直接匹配文件名
+        if (string.match(/\.\w+$/g)) {
+            matchString = '_assets/' + string + '**';
+        } else {
+            //没有后缀的则直接匹配文件夹下的所有文件
+            _readRecordFileArray.splice(n, 1);
+            n--;
+            if (string !== '')
+                matchString = '**/' + string + '/**';
+            else
+                matchString = '';
+        }
+        let plus = glob.plus(_relativePath + matchString, {ignore: 'node_modules/**'})
+        plus.on('file', ({name, stats, data}) => {
+            let reg = new RegExp(_relativePath);
+            let absoluteNamePath = name.replace(reg, _rootPath);
+            _assetsRecordFileArray.push(absoluteNamePath);
+        });
+        plus.on('end', () => {
+            let index = n + 1;
+            if (index < _readRecordFileArray.length)
+                findRecordAssetsFile(index, callback);
+            else {
+
+                if (_uploadType === 'assetsToAssets') {
+                    _allRecordFileArray = _assetsRecordFileArray;
+                } else if (_uploadType === 'normalToAssets') {
+                    _allRecordFileArray = _readRecordFileArray;
+                } else {
+                    _allRecordFileArray = _readRecordFileArray.concat(_assetsRecordFileArray);
+                }
+
+                _consoleLog('要操作的所有的相关的文件', _allRecordFileArray);
+                if (callback)
+                    callback();
+            }
+        })
+    }
 }
 
 
