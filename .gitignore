@@ -9,3 +9,4 @@ config/production
 public/static/upload
 .record
 upOssConfig.json
+node_modules
