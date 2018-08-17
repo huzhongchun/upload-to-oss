@@ -3,12 +3,23 @@
  * 文件改动监测程序
  */
 
-var fs = require('fs');
-var glob = require("glob-plus");
-var watch = require('node-watch');
-var watcher = require('watchr');
+var chokidar = require('chokidar');
 var getConfig = require('./config.js');
 var log4js = require('log4js');
+var fs = require('fs');
+
+
+
+var _rootPath = '/';
+var _relativePath = '';
+var _recordsArray = [], _changedRecordsArray = [];
+var _intervalLoop = null; //时间监测;
+var _ignoreFilesNameArray = [];
+var _recordFilePath = '';
+var _configJsonFile = '';
+//格式化log打印
+var _consoleLog = getConfig.consoleLog;
+var _autoSave = 20;
 
 log4js.configure({
     appenders:[{
@@ -20,75 +31,66 @@ log4js.configure({
 });
 var log = log4js.getLogger();
 
-var _rootPath = '/';
-var _relativePath = '';
-var _recordsArray = [], _changedRecordsArray = [];
-var _intervalLoop = null; //时间监测;
-var _ignoreFilesNameArray = [];
-var _ignoreFilesPathArray = [];
-var _recordFilePath = '';
-var _configJsonFile = '';
-//格式化log打印
-var _consoleLog = getConfig.consoleLog;
-var _autoSave = 20;
+
+// One-liner for current directory, ignores .dotfiles
+var watcher,
+    _changedRecordsArray =[];
+
+
+//执行目录
+var _processRunPath = process.cwd()+'/';
+
+
+//只监测文件改动，不处理文件夹的变化
+function ready () {
+    watcher.on('change',(path)=>{
+        _changedRecordsArray.push(_processRunPath+'/'+path);
+        updateWriteRecordFile();
+    });
+    watcher.on('add',(path)=>{
+        _changedRecordsArray.push(_processRunPath+'/'+path);
+        updateWriteRecordFile();
+    });
+    watcher.on('unlink',(path)=>{
+        _changedRecordsArray.push(_processRunPath+'/'+path);
+        updateWriteRecordFile();
+    });
+}
+
+var _updateWriteRecordFile = null;
+function updateWriteRecordFile() {
+    _updateWriteRecordFile && clearTimeout(_updateWriteRecordFile);
+    _updateWriteRecordFile = setTimeout(()=>{
+        updateRecordFile(_changedRecordsArray);
+    },100)
+}
+
+
+getConfig.findConfigJsonFile(function (config) {
+    _relativePath = config.relativePath;
+    _rootPath = config.rootPath;
+    _configJsonFile = _rootPath + config.configFileName;
+    _recordFilePath = _rootPath + config.recordFileName;
+    _ignoreFilesNameArray = config.ignores;
+
+
+    checkFileExists(_recordFilePath);
+    watcher = chokidar.watch('.', {ignored: [/(^|[\/\\])\../].concat(_ignoreFilesNameArray)});
+    watcher.on('ready',()=>{
+        console.log('ready');
+        ready();
+    });
+
+});
+
+
+
 
 /**
  * 获取运行参数
  * 如果没有传入,则默认当前文件夹下
  */
 _watchPath = process.argv[3] ? process.argv[3] : './';
-
-
-/**
- * 启动监测程序,把监测到改变了的文件路劲写入记录文件
- *
- * _changedRecordsArray记录更改的文件,当记录的数量>=10个的时候,写入记录文件,以减少写入操作
- * _intervalLoop 辅助监测写入文件,如果更改记录没有达到100次, 辅助监测程序会在20秒之后把记录存入记录文件
- */
-function startWatchProgram() {
-    var stalker = watcher.create(_rootPath+_watchPath);
-    stalker.on('change',function(changeType, fullPath, currentStat, previousStat){
-        var filename = fullPath;
-        _consoleLog('变化的文件',filename);
-        if (!repeatCheck(filename,_changedRecordsArray) && !ignoreCheck(filename,_ignoreFilesPathArray)) {
-            _changedRecordsArray.push(filename);
-            updateIntervalLoop();
-        }
-        if (_changedRecordsArray.length >= 100) {
-            updateRecordFile(_changedRecordsArray);
-        }
-    });
-    stalker.on('log', console.log);
-    stalker.once('close', function (reason) {
-        _consoleLog('Watcher closed!', _rootPath, ',because: ', reason);
-        stalker.removeAllListeners();
-    });
-
-    var stalkerIgnoreFilesArray = [];
-    for(let i=0;i<_ignoreFilesNameArray.length;i++){
-        stalkerIgnoreFilesArray.push(_rootPath+_ignoreFilesNameArray[i]);
-    }
-    stalker.setConfig({
-        stat: null,
-        interval: 5007,
-        persistent: true,
-        catchupDelay: 2000,
-        preferredMethods: ['watch', 'watchFile'],
-        followLinks: true,
-        ignorePaths: stalkerIgnoreFilesArray,
-        ignoreHiddenFiles: true,
-        ignoreCommonPatterns: true,
-        ignoreCustomPatterns: null
-    });
-
-    function next (err) {
-        if ( err )  return console.log('watch failed on', _rootPath, 'with error', err)
-        console.log('watch successful on', _rootPath)
-    }
-
-    stalker.watch(next);
-    //stalker.close();
-}
 
 
 /**
@@ -120,38 +122,6 @@ function repeatCheck(string,data) {
 
 
 /**
- * 监测是否是忽略的文件
- * 使用 == 绝对匹配
- * @param string
- * @returns {*}
- */
-function ignoreCheck(string,data) {
-    var result = false;
-    for(var  i= 0;i < data.length;i++){
-        if(data[i] == string){
-            result = true;
-            break;
-        }
-    }
-    return result;
-}
-
-
-/**
- * 更新辅助监测程序
- */
-function updateIntervalLoop() {
-    clearInterval(_intervalLoop);
-    _intervalLoop = setTimeout(function () {
-        if(_changedRecordsArray.length > 0){
-            _consoleLog('提示','辅助监测程序执行!');
-            updateRecordFile(_changedRecordsArray);
-        }
-    },_autoSave * 1000);
-}
-
-
-/**
  * 更新记录
  * @param recordsArray
  */
@@ -168,7 +138,7 @@ function updateRecordFile(recordsArray) {
             }
         }
         diffArray = _recordsArray;
-        _consoleLog('匹配到的新的记录:',diffArray);
+        diffArray && diffArray.length > 0 && _consoleLog('匹配到的新的记录:',diffArray);
         //把不同的记录写入文件
         if(diffArray.length >0) {
             writeRecordFile('\n'+diffArray.join('\n') , _recordFilePath, '', function () {
@@ -235,71 +205,6 @@ function checkFileExists(filePath) {
         _consoleLog('提示','记录文件创建成功!');
     }
 }
-
-
-/**
- * 获取忽略的文件
- * @param callback
- */
-function getIgnoreFiles(callback) {
-    findIgnoreFiles(0,function () {
-        if(callback)
-            callback();
-    });
-}
-
-
-/**
- * 递归获取忽略的文件的路径
- * @param n
- * @param callback
- *
- * 不使用 path.extname的原因是,记录文件的名字是".record",path.extname匹配不出扩展名
- */
-function findIgnoreFiles(n,callback) {
-    var matchString = '', string = _ignoreFilesNameArray[n];
-    //如果有扩展名
-    if(string.match(/\.\w+$/g)){
-        matchString = '**/'+string+'**';
-    }else{
-        //没有的则直接匹配文件夹下的所有文件
-        matchString = string+'/**';
-    }
-    let plus = glob.plus(_relativePath + matchString)
-    plus.on('file', ({ name, stats, data }) => {
-        let namePath = _rootPath+name;
-        _ignoreFilesPathArray.push(namePath);
-    });
-    plus.on('end', () => {
-        let index = n+1;
-        if(index < _ignoreFilesNameArray.length)
-            findIgnoreFiles(index,callback);
-        else{
-            //_consoleLog('忽略的文件',_ignoreFilesPathArray);
-            if(callback)
-                callback();
-        }
-    })
-}
-
-
-
-
-/**
- * 启动程序,保证所有忽略文件都已经找到之后,再启动监测程序;
- */
-
-
-getConfig.findConfigJsonFile(function (config) {
-    _relativePath = config.relativePath;
-    _rootPath = config.rootPath;
-    _configJsonFile = _rootPath + config.configFileName;
-    _recordFilePath = _rootPath + config.recordFileName;
-    _ignoreFilesNameArray = config.ignores;
-    _autoSave = parseInt(config.autoSave);
-    getIgnoreFiles(startWatchProgram);
-
-});
 
 
 
