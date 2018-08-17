@@ -44,15 +44,15 @@ var _processRunPath = process.cwd()+'/';
 //只监测文件改动，不处理文件夹的变化
 function ready () {
     watcher.on('change',(path)=>{
-        _changedRecordsArray.push(_processRunPath+'/'+path);
+        _changedRecordsArray.push(_processRunPath+path);
         updateWriteRecordFile();
     });
     watcher.on('add',(path)=>{
-        _changedRecordsArray.push(_processRunPath+'/'+path);
+        _changedRecordsArray.push(_processRunPath+path);
         updateWriteRecordFile();
     });
     watcher.on('unlink',(path)=>{
-        _changedRecordsArray.push(_processRunPath+'/'+path);
+        _changedRecordsArray.push(_processRunPath+path);
         updateWriteRecordFile();
     });
 }
